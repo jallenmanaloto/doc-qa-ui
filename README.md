@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Doc Q&A - Frontend (NextJS & Typescript)
+
+## Overview
+
+A simple frontend for uploading documents and asking natural-language questions to your knowledge base. Built with Next.js + TypeScript and a clean, minimal UI.
+
+## Features
+
+- Add Documents (`/docs`)
+    - Add one or more documents with id, title, and content.
+    - Submits to backend POST /ingest.
+    - Displays success/error messages.
+
+- Ask Questions (`/ask`)
+    - Input a natural-language question.
+    - Submits to backend `POST` /ask.
+    - Displays answer and list of sources (doc ID + title + optional score).
+
+- Responsive and modern UI using Tailwind CSS.
+- Basic client-side form validation for empty fields.
+
+## Tech Stack
+
+- Frontend Framework: Next.js 16 (app router)
+- Language: TypeScript
+- UI & Icons: Tailwind CSS + Lucide React icons
+- State Management: React useState hooks
+
+## Pages
+
+`/docs` - Add Documents
+- Form to create one or more documents.
+- Each document has:
+    - id (string)
+    - title (string)
+    - content (textarea, plain text)
+
+- Features:
+    - Add/Remove documents dynamically.
+    - Form validation to prevent empty fields.
+    - Upload button calls backend API POST /ingest.
+
+`/ask` - Ask a Question
+- Input field for natural-language question.
+- Submit triggers backend API POST /ask.
+- Displays:
+    - Answer returned by backend.
+    - List of sources with doc ID and title.
+
+## Folder Structure
+
+```bash
+src/
+└─ app/
+   ├─ page.tsx
+   ├─ layout.tsx
+   ├─ globals.css
+   ├─ docs/
+   │  └─ page.tsx
+   └─ ask/
+      └─ page.tsx
+```
 
 ## Getting Started
 
-First, run the development server:
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file with the backend endpoints
+```bash
+NEXT_PUBLIC_INGEST_ENDPOINT=http://localhost:3001/ingest
+NEXT_PUBLIC_ASK_ENDPOINT=http://localhost:3001/ask
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tradeoffs & Production Consideration
 
-## Learn More
+1. Page Structure & Componentization
+    - For simplicity, each page (`/`, `/docs`, `/ask`) is implemented as a single `page.tsx`.
+    - This keeps the assessment easy to read and avoids premature abstraction.
+    - Production-grade code would extract shared UI (inputs, buttons, alerts, forms) into reusable components to improve maintainability and reduce duplication.
 
-To learn more about Next.js, take a look at the following resources:
+2. State Management & Async Handling
+    - Async state (loading, success, error) is managed manually using `useState`.
+    - In production, a library such as TanStack Query would:
+        - Handle loading/error states automatically
+        - Enable request deduplication and caching
+        - Simplify retries and background refetching
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3. Form Validation
+    - Basic validation is done inline (checking for empty fields before submission).
+    - This keeps the logic lightweight and easy to follow.
+    - Production-grade validation would use schema-based validation (e.g., Zod) to:
+        - Enforce consistent input rules
+        - Provide clearer error messages
+        - Share validation logic between frontend and backend
